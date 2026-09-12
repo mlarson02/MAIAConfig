@@ -16,14 +16,14 @@ def get_digi_args():
         "--OverlayFullPathToMuPlus",
         help="Path to files for muplus BIB overlay",
         type=str,
-        default="/path/to/muplus/",
+        default="/ospool/uc-shared/project/futurecolliders/data/fmeloni/DataMuC_MAIA_v0/v9/BIB10TeV/sim_mp/",
     )
 
     parser.add_argument(
         "--OverlayFullPathToMuMinus",
         help="Path to files for muminus BIB overlay",
         type=str,
-        default="/path/to/muminus/",
+        default="/ospool/uc-shared/project/futurecolliders/data/fmeloni/DataMuC_MAIA_v0/v9/BIB10TeV/sim_mm/",
     )
 
     parser.add_argument(
@@ -51,6 +51,14 @@ def get_digi_args():
     parser.add_argument(
         "--doOverlayIP",
         help="Do incoherent pairs overlay",
+        action="store_true",
+        default=False,
+    )
+
+    parser.add_argument(
+        "--doOverlayCalo",
+        help="Overlay background hits into the calorimeter collections. Off by "
+             "default because the tracker-only digi does not consume them.",
         action="store_true",
         default=False,
     )
@@ -93,7 +101,7 @@ def get_digi_args():
         "--doTrackerConing",
         help="Filter tracker hits into cones around the signal MC particles (BIB cleaning)",
         action="store_true",
-        default=False,
+        default=True,
     )
 
     parser.add_argument(

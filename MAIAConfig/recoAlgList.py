@@ -40,13 +40,17 @@ def makeRecoAlgList(the_args):
         algList.append(deduper_cfg("GNNDirectDeduper", "GNNTrackCandidates", "GNNDirectDedupedTracks"))
         algList.append(track_filter_cfg("GNNDirectFilterer", "GNNDirectDedupedTracks", "GNNDirectSiTracks"))
 
-    if the_args.doCLUE:
-        from Clustering.clue import CLUEWrapper_cfg
-        algList.append(CLUEWrapper_cfg(the_args))
+    # --- Tracker-only mode: CLUE (calo clustering) disabled ---
+    # if the_args.doCLUE:
+    #     from Clustering.clue import CLUEWrapper_cfg
+    #     algList.append(CLUEWrapper_cfg(the_args))
 
     # Track Performance Monitoring
     if the_args.doTrackPerf:
         from Diagnostics.track_performance import track_truth_cfg
+        from Tracking.CKF_tracking import track_truth_all_tracks_cfg, track_truth_deduped_cfg
+        algList.append(track_truth_all_tracks_cfg(the_args))
+        algList.append(track_truth_deduped_cfg(the_args))
         algList.append(track_truth_cfg(the_args))
         if the_args.findGNNTracks:
             algList.append(track_truth_cfg(
@@ -56,9 +60,10 @@ def makeRecoAlgList(the_args):
                 the_args, "GNNDirectTruthMatcher", "GNNDirectSiTracks", "GNNDirectSiTrackRelations"
             ))
 
-    # Pandora PFOs
-    from ParticleFlow.pandora import pandoraPFA_cfg, fastJet_cfg
-    algList.append(pandoraPFA_cfg(the_args))
-    algList.append(fastJet_cfg())
+    # --- Tracker-only mode: Pandora PFO + FastJet disabled ---
+    # # Pandora PFOs
+    # from ParticleFlow.pandora import pandoraPFA_cfg, fastJet_cfg
+    # algList.append(pandoraPFA_cfg(the_args))
+    # algList.append(fastJet_cfg())
 
     return algList

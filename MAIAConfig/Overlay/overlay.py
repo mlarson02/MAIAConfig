@@ -97,12 +97,13 @@ def overlay_cfg(args):
     digitisers pick up via Common.overlay_utils.overlay_input.
     """
     groups, number_background = _background_groups(args)
+    calo_windows = _CALO_WINDOWS if args.doOverlayCalo else {}
 
     return OverlayTimingRandomMix(
         "Overlay",
         BackgroundFileNames = groups,
         NumberBackground = number_background,
-        TimeWindows = {**_TRACKER_WINDOWS, **_CALO_WINDOWS},
+        TimeWindows = {**_TRACKER_WINDOWS, **calo_windows},
         BackgroundMCParticleCollectionName = "MCParticles",
         # The background MC particles (millions of them per event) are not kept:
         # the background hits carry their truth momentum instead of a relation.
@@ -111,12 +112,12 @@ def overlay_cfg(args):
         # downstream digitisers can resolve their input collections.
         CopyCellIDMetadata = True,
         SimTrackerHits = list(_TRACKER_WINDOWS),
-        SimCalorimeterHits = list(_CALO_WINDOWS),
+        SimCalorimeterHits = list(calo_windows),
         MCParticles = ["MCParticles"],
         OutputSimTrackerHits = ["Overlay" + name for name in _TRACKER_WINDOWS],
-        OutputSimCalorimeterHits = ["Overlay" + name for name in _CALO_WINDOWS],
+        OutputSimCalorimeterHits = ["Overlay" + name for name in calo_windows],
         OutputCaloHitContributions = [
             "Overlay" + name.replace("Collection", "ContributionCollection")
-            for name in _CALO_WINDOWS],
+            for name in calo_windows],
         OutputLevel = INFO
     )
