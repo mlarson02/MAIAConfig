@@ -17,8 +17,8 @@ algList = makeRecoAlgList(args)
 # Read the digitisation output, write the reconstruction output
 app = build_application(
     args, algList,
-    input_files = ["digi_output.edm4hep.root"],
-    output_file = "reco_output.edm4hep.root",
+    input_files = ["muon_50GeV_eta0_1kEv_nominaltiming_coned_NoBIB_digi.edm4hep.root"],
+    output_file = "muon_50GeV_eta0_1kEv_nominaltiming_NOMINALSTEERING_coned_NoBIB_OTSeeding_OutsideIn_reco.edm4hep.root",
     histo_file = "reco_histograms.root",
 )
 

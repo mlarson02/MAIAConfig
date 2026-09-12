@@ -52,7 +52,7 @@ def get_reco_args():
         "--doTrackerConing",
         help="Filter tracker hits into cones around the signal MC particles (BIB cleaning)",
         action="store_true",
-        default=False,
+        default=True,
     )
 
     # Shared with digi_args.
