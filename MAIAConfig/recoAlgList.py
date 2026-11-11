@@ -19,7 +19,7 @@ def makeRecoAlgList(the_args):
     ActsGeoSvc_cfg(the_args)  # service: configure it, do NOT append to the algorithm list
     algList.append(CKFTracker_cfg(the_args))
     algList.append(deduper_cfg())
-    algList.append(track_filter_cfg())
+    algList.append(track_filter_cfg(the_args))
 
     # GNN Tracking. Runs alongside the standard CKF chain above rather than
     # replacing it: the GNN track finder produces candidates that can seed a second
@@ -33,12 +33,12 @@ def makeRecoAlgList(the_args):
         # Seeded path: the candidates seed a CKF pass, which is then cleaned up.
         algList.append(CKFFromSeeds_cfg(the_args))
         algList.append(deduper_cfg("GNNDeduper", "GNNAllTracks", "GNNDedupedTracks"))
-        algList.append(track_filter_cfg("GNNFilterer", "GNNDedupedTracks", "GNNSiTracks"))
+        algList.append(track_filter_cfg(the_args, "GNNFilterer", "GNNDedupedTracks", "GNNSiTracks"))
         # Direct path: the same candidates are cleaned up as they come out of the
         # GNN, without the CKF in between, to separate what the GNN itself finds
         # from what the CKF makes of it.
         algList.append(deduper_cfg("GNNDirectDeduper", "GNNTrackCandidates", "GNNDirectDedupedTracks"))
-        algList.append(track_filter_cfg("GNNDirectFilterer", "GNNDirectDedupedTracks", "GNNDirectSiTracks"))
+        algList.append(track_filter_cfg(the_args, "GNNDirectFilterer", "GNNDirectDedupedTracks", "GNNDirectSiTracks"))
 
     # --- Tracker-only mode: CLUE (calo clustering) disabled ---
     # if the_args.doCLUE:

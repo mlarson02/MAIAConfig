@@ -1,8 +1,20 @@
 import os
 from k4FWCore.parseArgs import parser
 from Common.argutils import add_argument_once
+from TrackerDigi.timing_presets import TIMING_PRESETS
 
 def get_digi_args():
+    # Overlay + digitiser time windows together, by name. An argument rather
+    # than constants in the config files, so a condor job's windows are fixed
+    # at submit time (configs/ is transferred when each job starts).
+    parser.add_argument(
+        "--timing",
+        help="Tracker integration time windows, by name (see "
+             "TrackerDigi/timing_presets.py)",
+        choices=sorted(TIMING_PRESETS),
+        default="nominal",
+    )
+
     # Shared with reco_args; added once so the two can be combined in one job.
     add_argument_once(
         parser,
@@ -30,7 +42,7 @@ def get_digi_args():
         "--OverlayFullNumberBackground",
         help="Number of background files used for BIB overlay",
         type=int,
-        default=1667, #Magic number for EU24 BIB
+        default=1666, #Magic number for EU24 BIB
     )
 
     parser.add_argument(
@@ -101,7 +113,16 @@ def get_digi_args():
         "--doTrackerConing",
         help="Filter tracker hits into cones around the signal MC particles (BIB cleaning)",
         action="store_true",
-        default=True,
+        default=False,
+    )
+
+    parser.add_argument(
+        "--coneAroundStatus",
+        help="MC generator statuses the tracker coning builds cones around "
+             "(e.g. 1 2 22 for staus, which are not status 1)",
+        type=int,
+        nargs="+",
+        default=[1],
     )
 
     parser.add_argument(

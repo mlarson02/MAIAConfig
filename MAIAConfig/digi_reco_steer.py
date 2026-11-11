@@ -34,8 +34,8 @@ algList = merge_alg_lists(makeDigiAlgList(args), makeRecoAlgList(args))
 # Read the simulation output, write the reconstruction output
 build_application(
     args, algList,
-    input_files = ["sim_output.edm4hep.root"],
-    output_file = "digireco_output.edm4hep.root",
+    input_files = ["muon_1kEv_pT2_1000GeV_theta88_92_sim.root"],
+    output_file = "muon_1kEv_pT2_1000GeV_theta88_92_NoBIB_digi.root",
     histo_file = "digireco_histograms.root",
 )
 

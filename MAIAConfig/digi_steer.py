@@ -18,7 +18,7 @@ algList = makeDigiAlgList(args)
 # Read the simulation output, write the digitisation output
 build_application(
     args, algList,
-    input_files = ["muon_50GeV_eta0_1kEv_sim.edm4hep.root"],
-    output_file = "muon_50GeV_eta0_1kEv_nominaltiming_coned_NoBIB_digi.edm4hep.root",
+    input_files = ["muon_1kEv_pT2_1000GeV_theta88_92_sim.root"],
+    output_file = "muon_1kEv_pT2_1000GeV_theta88_92_digi.root",
     histo_file = "digi_histograms.root",
 )

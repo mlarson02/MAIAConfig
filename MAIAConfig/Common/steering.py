@@ -46,19 +46,54 @@ CALORIMETER_HIT_TYPES = [
 ]
 
 
-def _drop_collection_types(collection_types):
+def _append_output_commands(new_commands):
     """
-    Append type-based drop commands to the IOSvc keep/drop switch.
+    Append commands to the IOSvc keep/drop switch.
 
     Reading the current value back before appending keeps successive calls
-    (tracker + calorimeter) from overwriting each other.
+    (tracker + calorimeter + overlay) from overwriting each other.
     """
     from k4FWCore import IOSvc
 
     io_svc = IOSvc("IOSvc")
     commands = list(getattr(io_svc, "outputCommands", [])) or ["keep *"]
-    commands += ["drop type " + coll_type for coll_type in collection_types]
-    io_svc.outputCommands = commands
+    io_svc.outputCommands = commands + list(new_commands)
+
+
+def _drop_collection_types(collection_types):
+    """Append type-based drop commands to the IOSvc keep/drop switch."""
+    _append_output_commands(["drop type " + coll_type for coll_type in collection_types])
+
+
+# Tracker sim-hit collections (the overlay writes "Overlay<name>", the coner
+# "<name>Coned") and the digitisers' hit -> sim-hit links.
+TRACKER_SIM_HITS = [
+    "VertexBarrelCollection", "VertexEndcapCollection",
+    "InnerTrackerBarrelCollection", "InnerTrackerEndcapCollection",
+    "OuterTrackerBarrelCollection", "OuterTrackerEndcapCollection",
+]
+TRACKER_HIT_LINKS = [
+    "VXDBarrelHitsRelations", "VXDEndcapHitsRelations",
+    "ITBarrelHitsRelations", "ITEndcapHitsRelations",
+    "OTBarrelHitsRelations", "OTEndcapHitsRelations",
+]
+
+
+def drop_overlay_sim_hits():
+    """
+    Coned runs: drop the overlaid sim hits (nearly all BIB, which carries no
+    truth), the uncone hit links (nothing coned uses them) and the coned
+    sim-hit subsets, which only point into the overlaid sim hits.
+
+    The hits, the coned links and the track -> MCParticle links (whose weight
+    is the track purity, computed in reco) are kept. The coned links' sim-hit
+    ends no longer resolve, so per-hit truth is gone from the output.
+    Same call-after-build_application requirement as drop_tracker_hits.
+    """
+    _append_output_commands(
+        ["drop Overlay" + name for name in TRACKER_SIM_HITS]
+        + ["drop " + name for name in TRACKER_HIT_LINKS]
+        + ["drop " + name + "Coned" for name in TRACKER_SIM_HITS])
 
 
 def drop_tracker_hits():

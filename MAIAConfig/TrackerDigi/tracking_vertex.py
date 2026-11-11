@@ -1,6 +1,7 @@
 from GaudiKernel.Constants import INFO, WARNING
 from Configurables import DDPlanarDigi
 from Common.overlay_utils import overlay_input
+from TrackerDigi.timing_presets import TIMING_PRESETS
 
 def VXDBarrel_cfg(args):
     """
@@ -9,6 +10,7 @@ def VXDBarrel_cfg(args):
     inputHitCollections = overlay_input("VertexBarrelCollection", args)
     return DDPlanarDigi(
         "VXDBarrelDigitiser",
+        # Raw hit times (ToF correction only in the window cut): the 4D seeding / CKF expects them.
         CorrectTimesForPropagation = False,
         CorrectTimeWindowForPropagation = True,
         IsStrip = False,
@@ -16,8 +18,9 @@ def VXDBarrel_cfg(args):
         ResolutionU = [0.005],
         ResolutionV = [0.005],
         SubDetectorName = "Vertex",
-        TimeWindowMax = [0.15],
-        TimeWindowMin = [-0.09],
+        # From the --timing preset, together with the overlay window.
+        TimeWindowMin = [TIMING_PRESETS[args.timing]["digitiser"]["vertex"][0]],
+        TimeWindowMax = [TIMING_PRESETS[args.timing]["digitiser"]["vertex"][1]],
         UseTimeWindow = True,
         SimTrackHitCollectionName = inputHitCollections,
         SimTrkHitRelCollection = ["VXDBarrelHitsRelations"],
@@ -33,6 +36,7 @@ def VXDEndcap_cfg(args):
     inputHitCollections = overlay_input("VertexEndcapCollection", args)
     return DDPlanarDigi(
         "VXDEndcapDigitiser",
+        # Raw hit times (ToF correction only in the window cut): the 4D seeding / CKF expects them.
         CorrectTimesForPropagation = False,
         CorrectTimeWindowForPropagation = True,
         IsStrip = False,
@@ -40,8 +44,9 @@ def VXDEndcap_cfg(args):
         ResolutionU = [0.005],
         ResolutionV = [0.005],
         SubDetectorName = "Vertex",
-        TimeWindowMax = [0.15],
-        TimeWindowMin = [-0.09],
+        # From the --timing preset, together with the overlay window.
+        TimeWindowMin = [TIMING_PRESETS[args.timing]["digitiser"]["vertex"][0]],
+        TimeWindowMax = [TIMING_PRESETS[args.timing]["digitiser"]["vertex"][1]],
         UseTimeWindow = True,
         SimTrackHitCollectionName = inputHitCollections,
         SimTrkHitRelCollection = ["VXDEndcapHitsRelations"],

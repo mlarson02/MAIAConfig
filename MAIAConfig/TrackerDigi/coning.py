@@ -23,7 +23,10 @@ _TRACKER_SUBDETECTORS = [
 ]
 
 
-def _coner_cfg(prefix, sim_collection):
+def _coner_cfg(prefix, sim_collection, cone_status):
+    # ConeAroundStatus set only when not the default [1], so builds without
+    # the property still run.
+    extra = {"ConeAroundStatus": cone_status} if cone_status != [1] else {}
     return FilterConeHits(
         f"{prefix}Coner",
         MCParticleCollection = ["MCParticles"],
@@ -36,9 +39,10 @@ def _coner_cfg(prefix, sim_collection):
         DeltaRCut = -1.0,
         FillHistograms = False,
         OutputLevel = INFO,
+        **extra,
     )
 
 
 def tracker_coner_cfgs(args):
     """Return one FilterConeHits per tracker subdetector."""
-    return [_coner_cfg(prefix, sim) for prefix, sim in _TRACKER_SUBDETECTORS]
+    return [_coner_cfg(prefix, sim, args.coneAroundStatus) for prefix, sim in _TRACKER_SUBDETECTORS]

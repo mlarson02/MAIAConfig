@@ -1,6 +1,7 @@
 from GaudiKernel.Constants import INFO, WARNING
 from Configurables import DDPlanarDigi
 from Common.overlay_utils import overlay_input
+from TrackerDigi.timing_presets import TIMING_PRESETS
 
 def OTBarrel_cfg(args):
     """
@@ -9,6 +10,7 @@ def OTBarrel_cfg(args):
     inputHitCollections = overlay_input("OuterTrackerBarrelCollection", args)
     return DDPlanarDigi(
         "OTBarrelDigitiser",
+        # Raw hit times (ToF correction only in the window cut): the 4D seeding / CKF expects them.
         CorrectTimesForPropagation = False,
         CorrectTimeWindowForPropagation = True,
         IsStrip = False,
@@ -16,8 +18,9 @@ def OTBarrel_cfg(args):
         ResolutionU = [0.007],
         ResolutionV = [0.09],
         SubDetectorName = "OuterTrackers",
-        TimeWindowMax = [0.3],
-        TimeWindowMin = [-0.18],
+        # From the --timing preset, together with the overlay window.
+        TimeWindowMin = [TIMING_PRESETS[args.timing]["digitiser"]["outer"][0]],
+        TimeWindowMax = [TIMING_PRESETS[args.timing]["digitiser"]["outer"][1]],
         UseTimeWindow = True,
         SimTrackHitCollectionName = inputHitCollections,
         SimTrkHitRelCollection = ["OTBarrelHitsRelations"],
@@ -33,6 +36,7 @@ def OTEndcap_cfg(args):
     inputHitCollections = overlay_input("OuterTrackerEndcapCollection", args)
     return DDPlanarDigi(
         "OTEndcapDigitiser",
+        # Raw hit times (ToF correction only in the window cut): the 4D seeding / CKF expects them.
         CorrectTimesForPropagation = False,
         CorrectTimeWindowForPropagation = True,
         IsStrip = False,
@@ -40,8 +44,9 @@ def OTEndcap_cfg(args):
         ResolutionU = [0.007],
         ResolutionV = [0.09],
         SubDetectorName = "OuterTrackers",
-        TimeWindowMax = [0.3],
-        TimeWindowMin = [-0.18],
+        # From the --timing preset, together with the overlay window.
+        TimeWindowMin = [TIMING_PRESETS[args.timing]["digitiser"]["outer"][0]],
+        TimeWindowMax = [TIMING_PRESETS[args.timing]["digitiser"]["outer"][1]],
         UseTimeWindow = True,
         SimTrackHitCollectionName = inputHitCollections,
         SimTrkHitRelCollection = ["OTEndcapHitsRelations"],

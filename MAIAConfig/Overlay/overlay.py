@@ -1,18 +1,27 @@
 import os
 from GaudiKernel.Constants import INFO, WARNING
 from Configurables import OverlayTimingRandomMix
+from TrackerDigi.timing_presets import TIMING_PRESETS
 
-# Per-collection integration time windows. The tracker windows are tighter than
-# the calorimeter ones; the same windows apply to every background source, so a
-# single map covers both the BIB and the incoherent-pair overlay.
-_TRACKER_WINDOWS = {
-    "VertexBarrelCollection": [-0.18, 0.18],
-    "VertexEndcapCollection": [-0.18, 0.18],
-    "InnerTrackerBarrelCollection": [-0.36, 0.36],
-    "InnerTrackerEndcapCollection": [-0.36, 0.36],
-    "OuterTrackerBarrelCollection": [-0.36, 0.36],
-    "OuterTrackerEndcapCollection": [-0.36, 0.36],
+# Tracker sim-hit collections and the subdetector whose integration window
+# applies, taken from the --timing preset (which also sets the digitisers'
+# windows, so the two cannot drift apart). The same windows apply to every
+# background source, so a single map covers both the BIB and the
+# incoherent-pair overlay.
+_TRACKER_COLLECTIONS = {
+    "VertexBarrelCollection": "vertex",
+    "VertexEndcapCollection": "vertex",
+    "InnerTrackerBarrelCollection": "inner",
+    "InnerTrackerEndcapCollection": "inner",
+    "OuterTrackerBarrelCollection": "outer",
+    "OuterTrackerEndcapCollection": "outer",
 }
+
+
+def _tracker_windows(args):
+    windows = TIMING_PRESETS[args.timing]["overlay"]
+    return {name: windows[det] for name, det in _TRACKER_COLLECTIONS.items()}
+
 # TODO: the Yoke (muon) calorimeter collections are intentionally omitted for
 # now. DDSimpleMuonDigi resolves its input cellID encoding at initialize(),
 # which is not available for overlay-produced collections, so the muon
@@ -97,13 +106,14 @@ def overlay_cfg(args):
     digitisers pick up via Common.overlay_utils.overlay_input.
     """
     groups, number_background = _background_groups(args)
+    tracker_windows = _tracker_windows(args)
     calo_windows = _CALO_WINDOWS if args.doOverlayCalo else {}
 
     return OverlayTimingRandomMix(
         "Overlay",
         BackgroundFileNames = groups,
         NumberBackground = number_background,
-        TimeWindows = {**_TRACKER_WINDOWS, **calo_windows},
+        TimeWindows = {**tracker_windows, **calo_windows},
         BackgroundMCParticleCollectionName = "MCParticles",
         # The background MC particles (millions of them per event) are not kept:
         # the background hits carry their truth momentum instead of a relation.
@@ -111,10 +121,10 @@ def overlay_cfg(args):
         # Propagate the cellID encoding metadata onto the Overlay* outputs so the
         # downstream digitisers can resolve their input collections.
         CopyCellIDMetadata = True,
-        SimTrackerHits = list(_TRACKER_WINDOWS),
+        SimTrackerHits = list(tracker_windows),
         SimCalorimeterHits = list(calo_windows),
         MCParticles = ["MCParticles"],
-        OutputSimTrackerHits = ["Overlay" + name for name in _TRACKER_WINDOWS],
+        OutputSimTrackerHits = ["Overlay" + name for name in tracker_windows],
         OutputSimCalorimeterHits = ["Overlay" + name for name in calo_windows],
         OutputCaloHitContributions = [
             "Overlay" + name.replace("Collection", "ContributionCollection")
